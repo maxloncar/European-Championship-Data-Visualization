@@ -1,0 +1,26 @@
+svg {
+    background-color: white;
+}
+
+h1 {
+    color: rgb(115, 115, 115);
+    font-size: 18px;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin: 0;
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+#container {
+    width: 800px;
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: white;
+}
+
+path:hover {
+    fill: rgba(8, 81, 156, 0.5);
+    cursor: pointer;
+}

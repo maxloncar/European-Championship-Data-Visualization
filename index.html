@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Europsko prvenstvo u nogometu</title>
+		<script src="https://d3js.org/d3.v6.min.js"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<div id="container">
+			<h1>Europsko prvenstvo u nogometu</h1>
+		</div>
+		<script type="text/javascript">
+				// width and height
+				var width = 800;
+				var height = 500;
+
+				// define map projection
+				var projection = d3.geoMercator() 
+								.center([ 13, 52 ])
+								.translate([ width/2, height/2 ])
+								.scale([ width/1.5 ]);
+
+				//Define path generator
+				var path = d3.geoPath()
+							.projection(projection);
+
+				//Create SVG
+				var svg = d3.select("#container")
+							.append("svg")
+							.attr("width", width)
+							.attr("height", height);
+
+				//Load in GeoJSON data
+				d3.json("countries.json").then(function(json) {
+					//Bind data and create one path per GeoJSON feature
+					svg.selectAll("path")
+						.data(json.features)
+						.enter()
+						.append("path")
+						.attr("d", path)
+						.attr("stroke", "rgba(8, 81, 156, 0.2)")
+						.attr("fill", "rgba(255, 0, 0, 0.7)")
+						.on("click", onClick);
+				});
+
+				function onClick(i, d) {
+					d3.json("euro_cup_teams.json").then(function(data) {
+						data.forEach(element => {
+							if (element.Country == d.properties.name) {
+								console.log(element.Team);
+							}
+						})
+					})
+				}
+		</script>
+	</body>
+</html>
