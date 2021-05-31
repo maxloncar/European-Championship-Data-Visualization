@@ -5,14 +5,23 @@
 		<title>Europsko prvenstvo u nogometu</title>
 		<script src="https://d3js.org/d3.v6.min.js"></script>
 		<script src="http://d3js.org/topojson.v1.min.js"></script>
-
+		<script src="https://unpkg.com/d3-v6-tip@1.0.6/build/d3-v6-tip.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
 		<div id="container">
-			<h1>Europsko prvenstvo u nogometu</h1>
+			<h1>Europsko prvenstvo u nogometu (UEFA EURO)</h1>
 		</div>
 		<script type="text/javascript">
+				//all countries who participated in EURO
+				var EUROcountries = [];
+				//all teams
+				d3.json("euro_cup_teams.json").then(function(data) {
+						data.forEach(element => {
+							EUROcountries.push(element);
+						})
+					})
+
 				// width and height
 				var width = 800;
 				var height = 500;
@@ -43,17 +52,38 @@
 						.attr("d", path)
 						.attr("stroke", "rgba(8, 81, 156, 0.2)")
 						.attr("fill", "rgba(255, 0, 0, 0.7)")
-						.on("click", onClick);
+						.on("click", onClick)
+						.on("mouseover", onMouseOver)
+						.on("mouseleave", onMouseLeave);
 				});
+
+				var tip = d3.tip().attr('class', 'd3tip');
+				svg.call(tip);
 
 				function onClick(i, d) {
 					d3.json("euro_cup_teams.json").then(function(data) {
 						data.forEach(element => {
 							if (element.Country == d.properties.name) {
 								console.log(element.Team);
+								console.log(EUROcountries);
 							}
 						})
 					})
+				}
+
+				function onMouseOver(i, d) {
+					EUROcountries.forEach(element => {
+						if (element == d.Team) {
+							tip.html(function(i) {
+								return `<h3>${d.Team}</h3>`;
+							})
+							tip.show(d, i.target);
+						}
+					});
+				}
+
+				function onMouseLeave() {
+					tip.hide();
 				}
 		</script>
 	</body>
