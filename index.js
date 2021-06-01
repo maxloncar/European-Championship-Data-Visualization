@@ -42,7 +42,7 @@ d3.json("countries.json").then(function (json) {
         .on("mouseleave", onMouseLeave);
 });
 
-var tip = d3.tip().attr('class', 'd3tip')
+const tip = d3.tip().attr('class', 'd3tip')
 svg.call(tip);
 
 function onClick(i, d) {
@@ -51,11 +51,36 @@ function onClick(i, d) {
             if (element.Country == d.properties.name) {
                 console.log(element.Team);
                 if (element.Country == "United Kingdom") {
-                    
+                    chooseUKCountry(element);
                 }
             }
         })
     })
+}
+
+function chooseUKCountry(element) {
+    let selectionContainer = document.querySelector("#selection");
+    selectionContainer.innerHTML = `
+        <div id="selectionBox">
+            <div id="header">
+                <h3>Choose UK country you want to display: </h3>
+                <input class="delete_button" type="image" src="img/button-delete.png">
+            </div>
+            <div id="buttons">
+                <button class="button england" type="button"><span>England</span></button>
+                <button class="button northern_ireland" type="button"><span>Northern Ireland</span></button>
+                <button class="button scotland" type="button"><span>Scotland</span></button>
+                <button class="button wales" type="button"><span>Wales</span></button>
+            </div>
+        </div>
+    `;
+    let closeButton = document.querySelector(".delete_button");
+    closeButton.addEventListener('click', onClickClose);
+}
+
+function onClickClose(event) {
+    let selectionBox = document.querySelector("#selectionBox");
+    selectionBox.remove();
 }
 
 function onMouseOver(i, d) {
@@ -65,9 +90,9 @@ function onMouseOver(i, d) {
                 tip.offset([20, 0])
                     .html(function (i) {
                         return `England<br>
-								Wales<br>
-							    Northern Ireland<br>
-								Scotland`;
+								Northern Ireland<br>
+							    Scotland<br>
+								Wales`;
                     })
             } else if (element.Country == "Norway") {
                 tip.offset([500, 30])
