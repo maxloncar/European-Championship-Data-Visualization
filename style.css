@@ -6,12 +6,12 @@ h1 {
   font-size: 30px;
   font-family: sans-serif;
   font-weight: bold;
-  margin-bottom: 5%;
+  margin-bottom: 4%;
   text-align: center;
 }
 
 #container {
-  width: 2000px;
+  width: 2200px;
   margin-left: 20px;
   margin-top: 20px;
   padding: 20px;
@@ -61,6 +61,10 @@ path:hover {
   top: 131px; */
   position: absolute;
   padding: 20px
+}
+
+.map {
+  box-shadow: 1px 1px 1px 2px rgb(217, 217, 217);
 }
 
 #header {
@@ -118,17 +122,79 @@ path:hover {
 }
 
 .pieChart {
-  transform: translate(30%, -250%);
+  transform: translate(40%, -300%);
+}
+
+.barChart {
+  transform: translate(-60%, 0%);
 }
 
 .countryName {
   display:  block;
-  font-size: 22px;
+  font-size: 25px;
   color: #fff;
-  text-align: right;
-  margin-right: 14%;
+  text-align: center;
+  transform: translate(20%, 0%);
 }
 
 .countryName.prikazi {
   color: black;
+}
+
+.barChartLegend {
+  transform: translate(30%, 70%);
+}
+
+@media only screen and (max-width: 1100px) {
+  .countryName {
+    transform: translate(100%, 0%);
+  }
+}
+
+@media screen and (min-width: 1101px) and (max-width: 1400px) {
+  .countryName {
+    transform: translate(70%, 0%);
+  }
+}
+
+@media screen and (min-width: 1401px) and (max-width: 1600px) {
+  .countryName {
+    transform: translate(50%, 0%);
+  }
+}
+
+@media screen and (min-width: 1601px) and (max-width: 1900px) {
+  .countryName {
+    transform: translate(30%, 0%);
+  }
+}
+
+@media screen and (min-width: 2500px) and (max-width: 2700px) {
+  .countryName {
+    transform: translate(10%, 0%);
+  }
+}
+
+@media screen and (min-width: 2701px) and (max-width: 3000px) {
+  .countryName {
+    transform: translate(10%, 0%);
+  }
+}
+
+@media screen and (min-width: 3001px) and (max-width: 3400px) {
+  .countryName {
+    transform: translate(0%, 0%);
+  }
+}
+
+@media screen and (min-width: 3401px) and (max-width: 3700px) {
+  .countryName {
+    transform: translate(-5%, 0%);
+  }
+}
+
+@media screen and (min-width: 3701px) and (max-width: 4000px) {
+  .countryName {
+    transform: translate(-10%, 0%);
+  }
 }

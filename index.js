@@ -7,11 +7,17 @@ d3.json("euro_cup_teams.json").then(function (data) {
     })
 })
 
+console.log(EUROcountries);
+const mapColors = d3.scaleOrdinal(["#2f4f4f","#556b2f","#7f0000","#483d8b","#008000","#bc8f8f","#b8860b","#000080","#32cd32",
+"#8fbc8f","#8b008b","#b03060","#ff0000","#ff8c00","#00ff00","#8a2be2","#dc143c","#A57164","#1B1811","#0000ff","#adff2f","#ff00ff",
+"#1e90ff","#ffff54","#dda0dd","#90ee90","#add8e6","#ff1493","#7b68ee","#ffa07a","#ffe4b5", "#E52B50", "#D2691E"]);
+
+
 var globalCountryName;
 
 // width and height
-var width = 900;
-var height = 700;
+var width = 1000;
+var height = 800;
 
 const margin = {top: 30, right: 30, bottom: 100, left: 100};
 const graphWidth = 500 - margin.left - margin.right;
@@ -47,39 +53,53 @@ d3.json("countries.json").then(function (json) {
         .enter()
         .append("path")
         .attr("d", path)
-        .attr("stroke", "rgba(8, 81, 156, 0.2)")
-        .attr("fill", "rgba(255, 0, 0, 0.7)")
+        .attr("stroke", "#736767")
+        .attr("fill", "rgba(8, 81, 156, 0.6)")
         .on("click", onClick)
         .on("mouseover", onMouseOver)
-        .on("mouseleave", onMouseLeave);
+        .on("mouseleave", onMouseLeave)
+        .attr("fill", function(d, i) {
+            var color = "rgb(233, 233, 233)";
+            EUROcountries.forEach(element => {
+                if (element.Country == d.properties.name) {
+                    color = mapColors(i);
+                }
+            });
+            return color;
+        });
 });
 
 var pieChartSvg = d3.select("#container")
     .append("svg")
-    .attr("width", 500)
+    .attr("width", 600)
     .attr("height", 200)
     .attr("class", "pieChart");
 
 var barChartSvg = d3.select("#container")
     .append("svg")
     .attr("width", 600)
-    .attr("height", 400)
-    .attr("class", "barChart")
+    .attr("height", 500)
+    .attr("class", "barChart");
+
+var barChartLegend = barChartSvg.append("g")
+    .attr("width", 700)
+    .attr("height", 200)
+    .attr("class", "barChartLegend");
 
 // PIE CHART
 
 var pieChartGroup = pieChartSvg.append("g")
     .attr("width", 300)
     .attr("height", 300)
-    .attr("transform", "translate(75,100)");
+    .attr("transform", "translate(75, 100)");
 
 var pieChartGroupLegend = pieChartSvg.append("g")
-    .attr("transform", `translate(160, 30)`);
+    .attr("transform", `translate(200, 60)`);
                             
-const pieChartColors = d3.scaleOrdinal(['#0000ff', '#000000', '#ff0000']);
+const pieChartColors = d3.scaleOrdinal(['#0000ff', '#00ff00', '#ff0000']);
 
 const pieChartLegend = d3.legendColor()
-    .shape("circle")
+    .shape("rect")
     .scale(pieChartColors)
     .title("Number of wins, draws and loses on EURO");
 
@@ -117,12 +137,12 @@ svg.call(tip);
 
 // AXIS
 
-const xAxisGroup = barChartGroup.append("g").attr("transform", `translate(0,${graphHeight})`);
+const xAxisGroup = barChartGroup.append("g").attr("transform", `translate(0, ${graphHeight})`);
 const yAxisGroup = barChartGroup.append("g");
 
 const updatePieChart = (data, i) => {
-    console.log(data);
-    console.log(i);
+    //console.log(data);
+    //console.log(i);
     let pieData = [];
     pieData = getPieData(data, i);
     // domain
@@ -141,7 +161,7 @@ const updatePieChart = (data, i) => {
         .duration(750)
         .attrTween("d", arcTweenUpdate);
     // create elements for data provided
-    console.log(pieData);
+    //console.log(pieData);
 
     paths.enter()
         .append("path")
@@ -196,8 +216,8 @@ function getCountryData(data, i) {
 function handleRects(countryData) {
     barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
 
-    var colors = ["#C6C6C6", "#AFAFAF", "#999999", "#777777", "#555555", "#333333", "#111111"];
-    /////rects
+    var colors = ["#fcebeb", "#fadede", "#fccfcf", "#fc9f9f", "#fa8787", "#fa5c5c", "#ff0000", "#9e0303"];
+    // Rectangles
     const rects = barChartGroup.selectAll("rect")
         .data(countryData);
 
@@ -211,7 +231,7 @@ function handleRects(countryData) {
         .attr("x", d => xScale(d.name))
         .transition().duration(750)
         .attr("y", d => yScale(d.value))
-        .attr("height", d => graphHeight - yScale(d.value));;
+        .attr("height", d => graphHeight - yScale(d.value));
 
     rects.enter()
         .append("rect")
@@ -220,12 +240,35 @@ function handleRects(countryData) {
             var value = Math.round(colorScale(d.value));
             return colors[value];
         })
+        .attr('stroke', 'black')
         .attr("x", d => xScale(d.name))
         .attr("y", graphHeight)
         .transition().duration(750)
         .attrTween("width", barWidthTween)
         .attr("y", d => yScale(d.value))
         .attr("height", d => graphHeight - yScale(d.value));
+
+    var x = 10;
+    for (var i = 0; i < 8; i++) {
+        barChartLegend.append('rect')
+            .attr('x', x)
+            .attr('y', 120)
+            .attr('width', 25)
+            .attr('height', 25)
+            .attr('stroke', 'black')
+            .attr('fill', colors[i]);
+        x += 30;
+    }
+
+    barChartLegend.append("text")
+        .attr("x", -75)
+        .attr("y", 140)
+        .text(`Manji broj`).style("font-size", 18);
+
+    barChartLegend.append("text")
+        .attr("x", 250)
+        .attr("y", 140)
+        .text(`Veći broj`).style("font-size", 18);
 }
 
 function addBarGraphTip() {
@@ -271,28 +314,33 @@ function updateBarChart(data, i) {
 
 const colorScale = d3.scaleLinear()
     .range([0, 6]);
-///scales and axes for bar chart
+// scales and axes for bar chart
 const yScale = d3.scaleLinear()
     .range([graphHeight, 0]);
 
 const xScale = d3.scaleBand()
     .range([0, 500])
-    .paddingInner(0.2)
-    .paddingOuter(0.2);
+    .paddingInner(0.3)
+    .paddingOuter(0.3);
 
 const xAxis = d3.axisBottom(xScale);
-const yAxis = d3.axisLeft(yScale)
-    .ticks(10);
+const yAxis = d3.axisLeft(yScale).ticks(10);
+
 const countryName = document.querySelector(".countryName");
 
 const barGraphTitle = barChartSvg.append("text").attr("transform", "translate(150,15)");
 
 function onClick(d, i) {
+    var flag = false;
+
     d3.json("euro_cup_teams.json").then(function (data) {
         data.forEach(element => {
             if (element.Country == i.properties.name) {
                 if (element.Country == "United Kingdom") {
-                    chooseUKCountry();
+                    if (flag == false) {
+                       chooseUKCountry(data, i);
+                       flag = true;
+                    }
                 } else {
                     updatePieChart(data, i);
                     updateBarChart(data, i);
@@ -302,7 +350,7 @@ function onClick(d, i) {
     })
 }
 
-function chooseUKCountry() {
+function chooseUKCountry(data, i) {
     let selectionContainer = document.querySelector("#selection");
     selectionContainer.innerHTML = `
         <div id="selectionBox">
@@ -322,18 +370,29 @@ function chooseUKCountry() {
     closeButton.addEventListener('click', onClickClose);
 
     const countryButtons = Array.from(document.querySelectorAll(".button"));
-    console.log(countryButtons);
+    // console.log(countryButtons);
+    // console.log(data[0]);
 
     for (let i = 0; i < countryButtons.length; i++) {
+        //console.log(countryButtons[i]);
         var countryButton = countryButtons[i];
         countryButton.addEventListener('click', (event) => {
             var clickedCountryButton = event.target;
             onClickClose();
-            globalCountryName = clickedCountryButton.textContent;
-            console.log(globalCountryName);
+
+            data.forEach(element => {
+                if (element.Team == clickedCountryButton.textContent) {
+                    var myUKTeam = {
+                        properties: { "name": element.Team }
+                    };
+
+                    updateBarChart(data, myUKTeam);
+                    updatePieChart(data, myUKTeam);
+                }
+            });
+            //globalCountryName = clickedCountryButton.textContent;
         })
     }
-    
 }
 
 function onClickClose() {
