@@ -1,23 +1,21 @@
-svg {
-    background-color: white;
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 h1 {
-    color: rgb(115, 115, 115);
-    font-size: 18px;
-    font-family: sans-serif;
-    font-weight: bold;
-    margin: 0;
-    padding-bottom: 20px;
-    text-align: center;
+  font-size: 30px;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-bottom: 5%;
+  text-align: center;
 }
 
 #container {
-    width: 900px;
-    margin-left: 20px;
-    margin-top: 20px;
-    padding: 20px;
-    background-color: white;
+  width: 2000px;
+  margin-left: 20px;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
 }
 
 path:hover {
@@ -31,7 +29,7 @@ path:hover {
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  border-radius: 2px;
+  border-radius: 7%;
 }
 
 .d3tip:after {
@@ -117,4 +115,20 @@ path:hover {
 
 #buttons {
   padding-left: 20%;
+}
+
+.pieChart {
+  transform: translate(30%, -250%);
+}
+
+.countryName {
+  display:  block;
+  font-size: 22px;
+  color: #fff;
+  text-align: right;
+  margin-right: 14%;
+}
+
+.countryName.prikazi {
+  color: black;
 }
