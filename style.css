@@ -1,0 +1,200 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  font-size: 30px;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-bottom: 4%;
+  text-align: center;
+}
+
+#container {
+  width: 2200px;
+  margin-left: 20px;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+}
+
+path:hover {
+    fill: rgba(8, 81, 156, 0.5);
+    cursor: pointer;
+}
+
+.d3tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 7%;
+}
+
+.d3tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+  }
+
+.d3tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+  }
+
+#selectionBox {
+  width: 360px;
+  border-radius: 1px;
+  box-shadow: 1px 3px 7px 0px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 1);
+  top: 30%;
+  right: 50%;
+  /* left: 1480px;
+  top: 131px; */
+  position: absolute;
+  padding: 20px
+}
+
+.map {
+  box-shadow: 1px 1px 1px 2px rgb(217, 217, 217);
+}
+
+#header {
+  display: flex;
+}
+
+.delete_button {
+  height: 20px;
+  margin-left: 5%;
+}
+
+.button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 28px;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+  vertical-align: middle;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+#buttons {
+  padding-left: 20%;
+}
+
+.pieChart {
+  transform: translate(40%, -300%);
+}
+
+.barChart {
+  transform: translate(-60%, 0%);
+}
+
+.countryName {
+  display:  block;
+  font-size: 25px;
+  color: #fff;
+  text-align: center;
+  transform: translate(20%, 0%);
+}
+
+.countryName.prikazi {
+  color: black;
+}
+
+.barChartLegend {
+  transform: translate(30%, 70%);
+}
+
+@media only screen and (max-width: 1100px) {
+  .countryName {
+    transform: translate(100%, 0%);
+  }
+}
+
+@media screen and (min-width: 1101px) and (max-width: 1400px) {
+  .countryName {
+    transform: translate(70%, 0%);
+  }
+}
+
+@media screen and (min-width: 1401px) and (max-width: 1600px) {
+  .countryName {
+    transform: translate(50%, 0%);
+  }
+}
+
+@media screen and (min-width: 1601px) and (max-width: 1900px) {
+  .countryName {
+    transform: translate(30%, 0%);
+  }
+}
+
+@media screen and (min-width: 2500px) and (max-width: 2700px) {
+  .countryName {
+    transform: translate(10%, 0%);
+  }
+}
+
+@media screen and (min-width: 2701px) and (max-width: 3000px) {
+  .countryName {
+    transform: translate(10%, 0%);
+  }
+}
+
+@media screen and (min-width: 3001px) and (max-width: 3400px) {
+  .countryName {
+    transform: translate(0%, 0%);
+  }
+}
+
+@media screen and (min-width: 3401px) and (max-width: 3700px) {
+  .countryName {
+    transform: translate(-5%, 0%);
+  }
+}
+
+@media screen and (min-width: 3701px) and (max-width: 4000px) {
+  .countryName {
+    transform: translate(-10%, 0%);
+  }
+}
