@@ -1,2 +1,2 @@
 # VP
-Vizualizacija podataka - projekt
+Data visualization - project
