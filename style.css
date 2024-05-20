@@ -2,12 +2,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-h1 {
+.title {
+  display: flex;
+  justify-content: center;
   font-size: 30px;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-bottom: 4%;
-  text-align: center;
+  font-weight: 700;
+
+  margin-bottom: 20px;
 }
 
 #container {
@@ -19,8 +20,8 @@ h1 {
 }
 
 path:hover {
-    fill: rgba(8, 81, 156, 0.5);
-    cursor: pointer;
+  fill: rgba(8, 81, 156, 0.5);
+  cursor: pointer;
 }
 
 .d3tip {
@@ -33,22 +34,22 @@ path:hover {
 }
 
 .d3tip:after {
-    box-sizing: border-box;
-    display: inline;
-    font-size: 10px;
-    width: 100%;
-    line-height: 1;
-    color: rgba(0, 0, 0, 0.8);
-    content: "\25BC";
-    position: absolute;
-    text-align: center;
-  }
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
 
 .d3tip.n:after {
-    margin: -1px 0 0 0;
-    top: 100%;
-    left: 0;
-  }
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
 
 #selectionBox {
   width: 360px;
@@ -57,10 +58,8 @@ path:hover {
   background: rgba(255, 255, 255, 1);
   top: 30%;
   right: 50%;
-  /* left: 1480px;
-  top: 131px; */
   position: absolute;
-  padding: 20px
+  padding: 20px;
 }
 
 .map {
@@ -81,7 +80,7 @@ path:hover {
   border-radius: 4px;
   background-color: #f4511e;
   border: none;
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
   font-size: 28px;
   padding: 20px;
@@ -100,7 +99,7 @@ path:hover {
 }
 
 .button span:after {
-  content: '\00bb';
+  content: "\00bb";
   position: absolute;
   opacity: 0;
   top: 0;
@@ -130,11 +129,9 @@ path:hover {
 }
 
 .countryName {
-  display:  block;
   font-size: 25px;
   color: #fff;
   text-align: center;
-  transform: translate(20%, 0%);
 }
 
 .countryName.prikazi {
@@ -143,58 +140,4 @@ path:hover {
 
 .barChartLegend {
   transform: translate(30%, 70%);
-}
-
-@media only screen and (max-width: 1100px) {
-  .countryName {
-    transform: translate(100%, 0%);
-  }
-}
-
-@media screen and (min-width: 1101px) and (max-width: 1400px) {
-  .countryName {
-    transform: translate(70%, 0%);
-  }
-}
-
-@media screen and (min-width: 1401px) and (max-width: 1600px) {
-  .countryName {
-    transform: translate(50%, 0%);
-  }
-}
-
-@media screen and (min-width: 1601px) and (max-width: 1900px) {
-  .countryName {
-    transform: translate(30%, 0%);
-  }
-}
-
-@media screen and (min-width: 2500px) and (max-width: 2700px) {
-  .countryName {
-    transform: translate(10%, 0%);
-  }
-}
-
-@media screen and (min-width: 2701px) and (max-width: 3000px) {
-  .countryName {
-    transform: translate(10%, 0%);
-  }
-}
-
-@media screen and (min-width: 3001px) and (max-width: 3400px) {
-  .countryName {
-    transform: translate(0%, 0%);
-  }
-}
-
-@media screen and (min-width: 3401px) and (max-width: 3700px) {
-  .countryName {
-    transform: translate(-5%, 0%);
-  }
-}
-
-@media screen and (min-width: 3701px) and (max-width: 4000px) {
-  .countryName {
-    transform: translate(-10%, 0%);
-  }
 }
