@@ -1,56 +1,23 @@
-// all countries who participated in EURO
-var EUROcountries = [];
-// all teams
-d3.json("euro_cup_teams.json").then(function (data) {
-  data.forEach((element) => {
-    EUROcountries.push(element);
+// all countries/teams who participated in UEFA EURO
+let euroCupTeams = [];
+
+// fetching JSON file euro_cup_teams
+d3.json("euro_cup_teams.json").then((teams) => {
+  teams.forEach((team) => {
+    euroCupTeams.push(team);
   });
 });
 
-console.log(EUROcountries);
+console.log(euroCupTeams);
 
-const mapColors = d3.scaleOrdinal([
-  "#2f4f4f",
-  "#556b2f",
-  "#7f0000",
-  "#483d8b",
-  "#008000",
-  "#bc8f8f",
-  "#b8860b",
-  "#000080",
-  "#32cd32",
-  "#8fbc8f",
-  "#8b008b",
-  "#b03060",
-  "#ff0000",
-  "#ff8c00",
-  "#00ff00",
-  "#8a2be2",
-  "#dc143c",
-  "#A57164",
-  "#1B1811",
-  "#0000ff",
-  "#adff2f",
-  "#ff00ff",
-  "#1e90ff",
-  "#ffff54",
-  "#dda0dd",
-  "#90ee90",
-  "#add8e6",
-  "#ff1493",
-  "#7b68ee",
-  "#ffa07a",
-  "#ffe4b5",
-  "#E52B50",
-  "#D2691E",
-]);
+const mapColors = d3.scaleOrdinal(["#2f4f4f"]);
 
 // global variable with UK country name
-var globalCountryName;
+let globalCountryName;
 
 // width and height
-var width = 1000;
-var height = 800;
+let width = 1000;
+let height = 800;
 
 // margin and graph height and width
 const margin = { top: 30, right: 30, bottom: 100, left: 100 };
@@ -58,26 +25,28 @@ const graphWidth = 500 - margin.left - margin.right;
 const graphHeight = 450 - margin.top - margin.bottom;
 
 // radii
-var outerRadius = 75;
-var innerRadius = outerRadius / 2;
+let outerRadius = 75;
+let innerRadius = outerRadius / 2;
 
 // define map projection
-var projection = d3
+let projection = d3
   .geoMercator()
   .center([13, 52])
   .translate([width / 2, height / 1.5])
   .scale([width / 1.5]);
 
 // Define path generator
-var path = d3.geoPath().projection(projection);
+let path = d3.geoPath().projection(projection);
 
 // Create SVG
-var svg = d3
+let svg = d3
   .select("#container")
   .append("svg")
   .attr("width", width)
   .attr("height", height)
   .attr("class", "map");
+
+var myColor = d3.scaleLinear().domain([0, 12]).range(["white", "blue"]);
 
 // Load in GeoJSON data
 d3.json("countries.json").then(function (json) {
@@ -94,10 +63,17 @@ d3.json("countries.json").then(function (json) {
     .on("mouseover", onMouseOver)
     .on("mouseleave", onMouseLeave)
     .attr("fill", function (d, i) {
-      var color = "rgb(233, 233, 233)";
-      EUROcountries.forEach((element) => {
+      let color = "rgb(233, 233, 233)";
+      euroCupTeams.forEach((element) => {
         if (element.Country == d.properties.name) {
-          color = mapColors(i);
+          console.log(
+            d.properties.name,
+            i,
+            element.Participations,
+            element.Country
+          );
+
+          color = myColor(element.Participations);
         }
       });
       return color;
@@ -105,14 +81,14 @@ d3.json("countries.json").then(function (json) {
 });
 
 // pie and bar chart svg
-var pieChartSvg = d3
+let pieChartSvg = d3
   .select("#container")
   .append("svg")
   .attr("width", 600)
   .attr("height", 200)
   .attr("class", "pieChart");
 
-var barChartSvg = d3
+let barChartSvg = d3
   .select("#container")
   .append("svg")
   .attr("width", 600)
@@ -120,20 +96,20 @@ var barChartSvg = d3
   .attr("class", "barChart");
 
 // bar chart legend
-var barChartLegend = barChartSvg
+let barChartLegend = barChartSvg
   .append("g")
   .attr("width", 700)
   .attr("height", 200)
   .attr("class", "barChartLegend");
 
 // PIE CHART
-var pieChartGroup = pieChartSvg
+let pieChartGroup = pieChartSvg
   .append("g")
   .attr("width", 300)
   .attr("height", 300)
   .attr("transform", "translate(75, 100)");
 
-var pieChartGroupLegend = pieChartSvg
+let pieChartGroupLegend = pieChartSvg
   .append("g")
   .attr("transform", `translate(200, 60)`);
 
@@ -153,7 +129,7 @@ const pie = d3
 const arcPath = d3.arc().outerRadius(outerRadius).innerRadius(innerRadius);
 
 // BAR CHART
-var barChartGroup = barChartSvg
+let barChartGroup = barChartSvg
   .append("g")
   .attr("width", graphWidth)
   .attr("height", graphHeight)
@@ -263,7 +239,7 @@ function getCountryData(data, i) {
 function handleRects(countryData) {
   barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
 
-  var colors = [
+  let colors = [
     "#fcebeb",
     "#fadede",
     "#fccfcf",
@@ -281,7 +257,7 @@ function handleRects(countryData) {
   rects
     .attr("width", xScale.bandwidth)
     .attr("fill", (d) => {
-      var value = Math.round(colorScale(d.value));
+      let value = Math.round(colorScale(d.value));
       return colors[value];
     })
     .attr("x", (d) => xScale(d.name))
@@ -295,7 +271,7 @@ function handleRects(countryData) {
     .append("rect")
     .attr("height", 0)
     .attr("fill", (d) => {
-      var value = Math.round(colorScale(d.value));
+      let value = Math.round(colorScale(d.value));
       return colors[value];
     })
     .attr("stroke", "black")
@@ -308,8 +284,8 @@ function handleRects(countryData) {
     .attr("height", (d) => graphHeight - yScale(d.value));
 
   // bar chart legend in form of rectangles
-  var x = 10;
-  for (var i = 0; i < 8; i++) {
+  let x = 10;
+  for (let i = 0; i < 8; i++) {
     barChartLegend
       .append("rect")
       .attr("x", x)
@@ -394,7 +370,7 @@ const barGraphTitle = barChartSvg
   .attr("transform", "translate(150,15)");
 
 function onClick(d, i) {
-  var flag = false;
+  let flag = false;
 
   d3.json("euro_cup_teams.json").then(function (data) {
     data.forEach((element) => {
@@ -438,14 +414,14 @@ function chooseUKCountry(data, i) {
 
   for (let i = 0; i < countryButtons.length; i++) {
     //console.log(countryButtons[i]);
-    var countryButton = countryButtons[i];
+    let countryButton = countryButtons[i];
     countryButton.addEventListener("click", (event) => {
-      var clickedCountryButton = event.target;
+      let clickedCountryButton = event.target;
       onClickClose();
 
       data.forEach((element) => {
         if (element.Team == clickedCountryButton.textContent) {
-          var myUKTeam = {
+          let myUKTeam = {
             properties: { name: element.Team },
           };
 
@@ -464,7 +440,7 @@ function onClickClose() {
 }
 
 function onMouseOver(i, d) {
-  EUROcountries.forEach((element) => {
+  euroCupTeams.forEach((element) => {
     if (element.Country == d.properties.name) {
       if (element.Country == "United Kingdom") {
         tip.offset([20, 0]).html(function (i) {
@@ -508,7 +484,7 @@ function onMouseLeave() {
 }
 
 function arcTweenUpdate(d) {
-  var i = d3.interpolate(this.trenutno, d);
+  let i = d3.interpolate(this.trenutno, d);
 
   this.trenutno = d;
 
@@ -518,7 +494,7 @@ function arcTweenUpdate(d) {
 }
 
 const arcTweenEnter = (d) => {
-  var i = d3.interpolate(d.endAngle, d.startAngle);
+  let i = d3.interpolate(d.endAngle, d.startAngle);
 
   return function (t) {
     d.startAngle = i(t);
@@ -527,7 +503,7 @@ const arcTweenEnter = (d) => {
 };
 
 function barWidthTween(d) {
-  var i = d3.interpolate(0, xScale.bandwidth());
+  let i = d3.interpolate(0, xScale.bandwidth());
   return function (t) {
     return i(t);
   };
