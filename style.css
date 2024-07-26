@@ -9,12 +9,22 @@ html {
 .title {
   display: flex;
   justify-content: center;
-  font-size: 30px;
+  font-size: 50px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin: 40px 0;
 }
 
 #container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#graphs {
+  display: flex;
+  flex-direction: column;
+  order: 2;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 path:hover {
@@ -118,22 +128,13 @@ path:hover {
   padding-left: 20%;
 }
 
-.pieChart {
-  transform: translate(40%, -300%);
-}
-
-.barChart {
-  transform: translate(-60%, 0%);
-}
-
 .countryName {
-  font-size: 25px;
-  color: #fff;
-  text-align: center;
-}
-
-.countryName.prikazi {
+  font-size: 42px;
+  font-weight: 700;
   color: black;
+  text-align: center;
+  height: 50px;
+  margin: 20px 0;
 }
 
 .barChartLegend {

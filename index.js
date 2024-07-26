@@ -8,13 +8,6 @@ d3.json("euro_cup_teams.json").then((teams) => {
   });
 });
 
-console.log(euroCupTeams);
-
-const mapColors = d3.scaleOrdinal(["#2f4f4f"]);
-
-// global variable with UK country name
-let globalCountryName;
-
 // width and height
 let width = 1000;
 let height = 800;
@@ -35,10 +28,10 @@ let projection = d3
   .translate([width / 2, height / 1.5])
   .scale([width / 1.5]);
 
-// Define path generator
+// define path generator
 let path = d3.geoPath().projection(projection);
 
-// Create SVG
+// create an SVG with d3
 let svg = d3
   .select("#container")
   .append("svg")
@@ -46,11 +39,12 @@ let svg = d3
   .attr("height", height)
   .attr("class", "map");
 
-var myColor = d3.scaleLinear().domain([0, 12]).range(["white", "blue"]);
+// linear color shades from white to blue
+let mapColorShades = d3.scaleLinear().domain([0, 10]).range(["white", "blue"]);
 
-// Load in GeoJSON data
+// load in GeoJSON data
 d3.json("countries.json").then(function (json) {
-  // Bind data and create one path per GeoJSON feature
+  // bind data and create one path per GeoJSON feature
   svg
     .selectAll("path")
     .data(json.features)
@@ -63,33 +57,27 @@ d3.json("countries.json").then(function (json) {
     .on("mouseover", onMouseOver)
     .on("mouseleave", onMouseLeave)
     .attr("fill", function (d, i) {
-      let color = "rgb(233, 233, 233)";
+      let mapColor = "rgb(233, 233, 233)"; // default color for countries that didn't participate in EURO
       euroCupTeams.forEach((element) => {
         if (element.Country == d.properties.name) {
-          console.log(
-            d.properties.name,
-            i,
-            element.Participations,
-            element.Country
-          );
-
-          color = myColor(element.Participations);
+          mapColor = mapColorShades(element.Participations);
         }
       });
-      return color;
+      return mapColor;
     });
 });
 
-// pie and bar chart svg
+// pie chart svg
 let pieChartSvg = d3
-  .select("#container")
+  .select("#graphs")
   .append("svg")
-  .attr("width", 600)
+  .attr("width", 270)
   .attr("height", 200)
   .attr("class", "pieChart");
 
+// bar chart svg
 let barChartSvg = d3
-  .select("#container")
+  .select("#graphs")
   .append("svg")
   .attr("width", 600)
   .attr("height", 500)
@@ -98,28 +86,26 @@ let barChartSvg = d3
 // bar chart legend
 let barChartLegend = barChartSvg
   .append("g")
-  .attr("width", 700)
-  .attr("height", 200)
+  .attr("width", 400)
+  .attr("height", 25)
   .attr("class", "barChartLegend");
 
-// PIE CHART
+// pie chart group
 let pieChartGroup = pieChartSvg
   .append("g")
   .attr("width", 300)
   .attr("height", 300)
   .attr("transform", "translate(75, 100)");
 
+// pie chart legend
 let pieChartGroupLegend = pieChartSvg
   .append("g")
-  .attr("transform", `translate(200, 60)`);
+  .attr("transform", `translate(200, 70)`);
 
+// pie chart colors
 const pieChartColors = d3.scaleOrdinal(["#0000ff", "#00ff00", "#ff0000"]);
 
-const pieChartLegend = d3
-  .legendColor()
-  .shape("rect")
-  .scale(pieChartColors)
-  .title("Number of wins, draws and loses on EURO");
+const pieChartLegend = d3.legendColor().shape("rect").scale(pieChartColors);
 
 const pie = d3
   .pie()
@@ -336,7 +322,6 @@ function addBarGraphAxes() {
 }
 
 function updateBarChart(data, i) {
-  countryName.classList.add("prikazi");
   countryName.innerHTML = `${i.properties.name}`;
 
   const countryData = getCountryData(data, i);
