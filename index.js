@@ -8,7 +8,7 @@ d3.json("euro_cup_teams.json").then((teams) => {
   });
 });
 
-// width and height
+// map width and height
 let width = 1000;
 let height = 800;
 
@@ -67,15 +67,25 @@ d3.json("countries.json").then(function (json) {
     });
 });
 
-// pie chart svg
-let pieChartSvg = d3
+// Creating pie chart
+let pieChartWithLegend = d3
   .select("#graphs")
   .append("svg")
   .attr("width", 270)
   .attr("height", 200)
   .attr("class", "pieChart");
 
-// bar chart svg
+let pieChart = pieChartWithLegend
+  .append("g")
+  .attr("width", 300)
+  .attr("height", 300)
+  .attr("transform", "translate(75, 100)");
+
+let pieChartGroupLegend = pieChartWithLegend
+  .append("g")
+  .attr("transform", `translate(200, 70)`);
+
+// Creating bar chart
 let barChartSvg = d3
   .select("#graphs")
   .append("svg")
@@ -83,24 +93,12 @@ let barChartSvg = d3
   .attr("height", 500)
   .attr("class", "barChart");
 
-// bar chart legend
 let barChartLegend = barChartSvg
   .append("g")
   .attr("width", 400)
   .attr("height", 25)
+  .attr("transform", `translate(180, 330)`)
   .attr("class", "barChartLegend");
-
-// pie chart group
-let pieChartGroup = pieChartSvg
-  .append("g")
-  .attr("width", 300)
-  .attr("height", 300)
-  .attr("transform", "translate(75, 100)");
-
-// pie chart legend
-let pieChartGroupLegend = pieChartSvg
-  .append("g")
-  .attr("transform", `translate(200, 70)`);
 
 // pie chart colors
 const pieChartColors = d3.scaleOrdinal(["#0000ff", "#00ff00", "#ff0000"]);
@@ -126,7 +124,7 @@ const tip = d3.tip().attr("class", "d3tip");
 
 const pieChartTip = d3.tip().attr("class", "d3tip");
 
-pieChartGroup.call(pieChartTip);
+pieChart.call(pieChartTip);
 
 const barChartTip = d3.tip().attr("class", "d3tip");
 
@@ -150,7 +148,7 @@ const updatePieChart = (data, i) => {
   pieChartGroupLegend.call(pieChartLegend);
 
   // setting paths
-  const paths = pieChartGroup.selectAll("path").data(pie(pieData));
+  const paths = pieChart.selectAll("path").data(pie(pieData));
 
   // deleting elements
   paths.exit().remove();
@@ -177,7 +175,7 @@ const updatePieChart = (data, i) => {
     .duration(1000)
     .attrTween("d", arcTweenEnter);
 
-  pieChartGroup
+  pieChart
     .selectAll("path")
     .on("mouseover", (d, i, n) => {
       pieChartTip.html((d) => {
@@ -223,7 +221,7 @@ function getCountryData(data, i) {
 }
 
 function handleRects(countryData) {
-  barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
+  // barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
 
   let colors = [
     "#fcebeb",
@@ -377,20 +375,21 @@ function onClick(d, i) {
 function chooseUKCountry(data, i) {
   let selectionContainer = document.querySelector("#selection");
   selectionContainer.innerHTML = `
-        <div id="selectionBox">
-            <div id="header">
+        <div class="selection-box">
+            <div class="selection-box__header">
                 <h3>Choose UK country you want to display: </h3>
-                <input class="delete_button" type="image" src="img/button-delete.png">
+                <input class="selection-box__delete-button" type="image" src="img/button-delete.png">
             </div>
-            <div id="buttons">
-                <button class="button england" type="button"><span>England</span></button>
-                <button class="button northern_ireland" type="button"><span>Northern Ireland</span></button>
-                <button class="button scotland" type="button"><span>Scotland</span></button>
-                <button class="button wales" type="button"><span>Wales</span></button>
+            <div class="selection-box__buttons">
+                <button class="selection-box__button"><span>England</span></button>
+                <button class="selection-box__button"><span>Northern Ireland</span></button>
+                <button class="selection-box__button"><span>Scotland</span></button>
+                <button class="selection-box__button"><span>Wales</span></button>
             </div>
         </div>
     `;
-  let closeButton = document.querySelector(".delete_button");
+
+  const closeButton = document.querySelector(".selection-box__delete-button");
   closeButton.addEventListener("click", onClickClose);
 
   const countryButtons = Array.from(document.querySelectorAll(".button"));
@@ -420,7 +419,7 @@ function chooseUKCountry(data, i) {
 }
 
 function onClickClose() {
-  let selectionBox = document.querySelector("#selectionBox");
+  const selectionBox = document.querySelector(".selection-box");
   selectionBox.remove();
 }
 
