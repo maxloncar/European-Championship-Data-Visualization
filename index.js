@@ -9,8 +9,8 @@ d3.json("euro_cup_teams.json").then((teams) => {
 });
 
 // map width and height
-let width = 1000;
-let height = 800;
+const width = 1000;
+const height = 800;
 
 // margin and graph height and width
 const margin = { top: 30, right: 30, bottom: 100, left: 100 };
@@ -18,21 +18,21 @@ const graphWidth = 500 - margin.left - margin.right;
 const graphHeight = 450 - margin.top - margin.bottom;
 
 // radii
-let outerRadius = 75;
-let innerRadius = outerRadius / 2;
+const outerRadius = 75;
+const innerRadius = outerRadius / 2;
 
 // define map projection
-let projection = d3
+const projection = d3
   .geoMercator()
   .center([13, 52])
   .translate([width / 2, height / 1.5])
   .scale([width / 1.5]);
 
 // define path generator
-let path = d3.geoPath().projection(projection);
+const path = d3.geoPath().projection(projection);
 
 // create an SVG with d3
-let svg = d3
+const svg = d3
   .select("#container")
   .append("svg")
   .attr("width", width)
@@ -40,7 +40,10 @@ let svg = d3
   .attr("class", "map");
 
 // linear color shades from white to blue
-let mapColorShades = d3.scaleLinear().domain([0, 10]).range(["white", "blue"]);
+const mapColorShades = d3
+  .scaleLinear()
+  .domain([0, 10])
+  .range(["white", "blue"]);
 
 // load in GeoJSON data
 d3.json("countries.json").then(function (json) {
@@ -68,37 +71,26 @@ d3.json("countries.json").then(function (json) {
 });
 
 // Creating pie chart
-let pieChartWithLegend = d3
+const pieChartWithLegend = d3
   .select("#graphs")
   .append("svg")
-  .attr("width", 270)
-  .attr("height", 200)
-  .attr("class", "pieChart");
+  .attr("class", "piechart");
 
-let pieChart = pieChartWithLegend
-  .append("g")
-  .attr("width", 300)
-  .attr("height", 300)
-  .attr("transform", "translate(75, 100)");
+const pieChart = pieChartWithLegend.append("g").attr("class", "piechart__svg");
 
-let pieChartGroupLegend = pieChartWithLegend
+const pieChartGroupLegend = pieChartWithLegend
   .append("g")
-  .attr("transform", `translate(200, 70)`);
+  .attr("class", "piechart__legend");
 
 // Creating bar chart
-let barChartSvg = d3
+const barChartSvg = d3
   .select("#graphs")
   .append("svg")
-  .attr("width", 600)
-  .attr("height", 500)
-  .attr("class", "barChart");
+  .attr("class", "barchart");
 
-let barChartLegend = barChartSvg
+const barChartLegend = barChartSvg
   .append("g")
-  .attr("width", 400)
-  .attr("height", 25)
-  .attr("transform", `translate(180, 330)`)
-  .attr("class", "barChartLegend");
+  .attr("class", "barchart__legend");
 
 // pie chart colors
 const pieChartColors = d3.scaleOrdinal(["#0000ff", "#00ff00", "#ff0000"]);
@@ -320,7 +312,7 @@ function addBarGraphAxes() {
 }
 
 function updateBarChart(data, i) {
-  countryName.innerHTML = `${i.properties.name}`;
+  country.innerHTML = `${i.properties.name}`;
 
   const countryData = getCountryData(data, i);
 
@@ -346,7 +338,7 @@ const xScale = d3
 const xAxis = d3.axisBottom(xScale);
 const yAxis = d3.axisLeft(yScale).ticks(10);
 
-const countryName = document.querySelector(".countryName");
+const country = document.querySelector(".country");
 
 const barGraphTitle = barChartSvg
   .append("text")
@@ -413,7 +405,7 @@ function chooseUKCountry(data, i) {
           updatePieChart(data, myUKTeam);
         }
       });
-      //globalCountryName = clickedCountryButton.textContent;
+      //globalcountry = clickedCountryButton.textContent;
     });
   }
 }
