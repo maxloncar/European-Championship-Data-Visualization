@@ -12,7 +12,7 @@ d3.json("euro_cup_teams.json").then((teams) => {
 const width = 1000;
 const height = 800;
 
-// margin and graph height and width
+// margin, width and height for the graphs
 const margin = { top: 30, right: 30, bottom: 100, left: 100 };
 const graphWidth = 500 - margin.left - margin.right;
 const graphHeight = 450 - margin.top - margin.bottom;
@@ -70,19 +70,39 @@ d3.json("countries.json").then(function (json) {
     });
 });
 
-// Creating pie chart
-const pieChartWithLegend = d3
+// PIECHART WITH A LEGEND
+const pieChartGroup = d3
   .select("#graphs")
   .append("svg")
   .attr("class", "piechart");
 
-const pieChart = pieChartWithLegend.append("g").attr("class", "piechart__svg");
+const pieChartSvg = pieChartGroup.append("g").attr("class", "piechart__svg");
 
-const pieChartGroupLegend = pieChartWithLegend
+const pieChartLegend = pieChartGroup
   .append("g")
   .attr("class", "piechart__legend");
 
-// Creating bar chart
+// pie chart colors for each arc
+const pieChartColors = d3.scaleOrdinal([
+  "rgb(0, 0, 255)",
+  "rgb(255, 255, 255)",
+  "rgb(204, 204, 255)",
+]);
+
+// creating a new color legend
+const pieChartColorLegend = d3.legendColor().scale(pieChartColors);
+
+// generating a pie for the given array of pie data without sorting
+// it returns an array of objects representing each arc of the pie
+const pie = d3
+  .pie()
+  .sort(null)
+  .value((d) => d.value);
+
+// creating a new arc generator with the specified inner and outer radius
+const arcPath = d3.arc().outerRadius(outerRadius).innerRadius(innerRadius);
+
+// BARCHART WITH A LEGEND
 const barChartSvg = d3
   .select("#graphs")
   .append("svg")
@@ -92,36 +112,19 @@ const barChartLegend = barChartSvg
   .append("g")
   .attr("class", "barchart__legend");
 
-// pie chart colors
-const pieChartColors = d3.scaleOrdinal(["#0000ff", "#00ff00", "#ff0000"]);
-
-const pieChartLegend = d3.legendColor().shape("rect").scale(pieChartColors);
-
-const pie = d3
-  .pie()
-  .sort(null)
-  .value((d) => d.value);
-
-const arcPath = d3.arc().outerRadius(outerRadius).innerRadius(innerRadius);
-
-// BAR CHART
-let barChartGroup = barChartSvg
+const barChartGroup = barChartSvg
   .append("g")
   .attr("width", graphWidth)
   .attr("height", graphHeight)
   .attr("transform", `translate(${margin.right + 35}, ${margin.top + 20})`);
 
-// TIP
+// D3TIP
+// tooltip initialization
 const tip = d3.tip().attr("class", "d3tip");
 
-const pieChartTip = d3.tip().attr("class", "d3tip");
-
-pieChart.call(pieChartTip);
-
-const barChartTip = d3.tip().attr("class", "d3tip");
-
-barChartGroup.call(barChartTip);
-
+// invoking the tooltip in the context of visualizations
+pieChartSvg.call(tip);
+barChartSvg.call(tip);
 svg.call(tip);
 
 // AXIS
@@ -131,16 +134,18 @@ const xAxisGroup = barChartGroup
 const yAxisGroup = barChartGroup.append("g");
 
 const updatePieChart = (data, i) => {
-  //console.log(data);
-  //console.log(i);
   let pieData = [];
-  pieData = getPieData(data, i);
+  pieData = getCountryResults(data, i);
   // domain
   pieChartColors.domain(pieData.map((d) => d.id));
-  pieChartGroupLegend.call(pieChartLegend);
+  pieChartLegend.call(pieChartColorLegend);
 
   // setting paths
-  const paths = pieChart.selectAll("path").data(pie(pieData));
+  const paths = pieChartSvg.selectAll("path").data(pie(pieData));
+
+  // Select the legend items and add a stroke
+  const pieRects = d3.selectAll(".legendCells rect").data(pieData);
+  pieRects.attr("stroke", "black").attr("stroke-width", 0.5);
 
   // deleting elements
   paths.exit().remove();
@@ -151,14 +156,13 @@ const updatePieChart = (data, i) => {
     .duration(750)
     .attrTween("d", arcTweenUpdate);
   // create elements for data provided
-  //console.log(pieData);
 
   paths
     .enter()
     .append("path")
     .attr("class", "arc")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 3)
+    .attr("stroke", "black")
+    .attr("stroke-width", 0.5)
     .attr("fill", (d) => pieChartColors(d.data.id))
     .each(function (d) {
       this.trenutno = d;
@@ -167,20 +171,20 @@ const updatePieChart = (data, i) => {
     .duration(1000)
     .attrTween("d", arcTweenEnter);
 
-  pieChart
+  pieChartSvg
     .selectAll("path")
     .on("mouseover", (d, i, n) => {
-      pieChartTip.html((d) => {
+      tip.html((d) => {
         return `${d.value}`;
       });
-      pieChartTip.show(i, d.target);
+      tip.show(i, d.target);
     })
     .on("mouseout", (d) => {
-      pieChartTip.hide();
+      tip.hide();
     });
 };
 
-function getPieData(data, i) {
+function getCountryResults(data, i) {
   const newPieData = [];
 
   data.forEach((element) => {
@@ -292,13 +296,13 @@ function addBarGraphTip() {
   barChartGroup
     .selectAll("rect")
     .on("mouseover", (d, i, n) => {
-      barChartTip.html((d) => {
+      tip.html((d) => {
         return `${d.value}`;
       });
-      barChartTip.show(i, d.target);
+      tip.show(i, d.target);
     })
     .on("mouseout", (d) => {
-      barChartTip.hide();
+      tip.hide();
     });
 }
 
@@ -384,7 +388,9 @@ function chooseUKCountry(data, i) {
   const closeButton = document.querySelector(".selection-box__delete-button");
   closeButton.addEventListener("click", onClickClose);
 
-  const countryButtons = Array.from(document.querySelectorAll(".button"));
+  const countryButtons = Array.from(
+    document.querySelectorAll(".selection-box__button")
+  );
   // console.log(countryButtons);
   // console.log(data[0]);
 
