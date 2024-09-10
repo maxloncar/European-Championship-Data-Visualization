@@ -70,7 +70,7 @@ d3.json("countries.json").then(function (json) {
     });
 });
 
-// PIECHART WITH A LEGEND
+// PIE CHART WITH A LEGEND
 const pieChartGroup = d3
   .select("#graphs")
   .append("svg")
@@ -102,7 +102,7 @@ const pie = d3
 // creating a new arc generator with the specified inner and outer radius
 const arcPath = d3.arc().outerRadius(outerRadius).innerRadius(innerRadius);
 
-// BARCHART WITH A LEGEND
+// BAR CHART WITH A LEGEND
 const barChartSvg = d3
   .select("#graphs")
   .append("svg")
@@ -127,24 +127,72 @@ pieChartSvg.call(tip);
 barChartSvg.call(tip);
 svg.call(tip);
 
-// AXIS
-const xAxisGroup = barChartGroup
+// AXISES
+const barChartAxisX = barChartGroup
   .append("g")
   .attr("transform", `translate(0, ${graphHeight})`);
-const yAxisGroup = barChartGroup.append("g");
+const barChartAxisY = barChartGroup.append("g");
 
-const updatePieChart = (data, i) => {
-  let pieData = [];
-  pieData = getCountryResults(data, i);
+// function that returns data for the selected country
+const getCountryData = function (data, feature) {
+  // country data needed for both pie and bar chart
+  const countryData = {
+    pieChartData: [],
+    barChartData: [],
+  };
+
+  data.forEach((element) => {
+    if (element.Team == feature.properties.name) {
+      // pie chart data
+      countryData.pieChartData.push({
+        id: `Wins: ${element.Win}`,
+        value: element.Win,
+      });
+      countryData.pieChartData.push({
+        id: `Draws: ${element.Draw}`,
+        value: element.Draw,
+      });
+      countryData.pieChartData.push({
+        id: `Losses: ${element.Loss}`,
+        value: element.Loss,
+      });
+
+      // bar chart data
+      countryData.barChartData.push({
+        name: "Participations",
+        value: element.Participations,
+      });
+      countryData.barChartData.push({ name: "Matches", value: element.Played });
+      countryData.barChartData.push({ name: "Points", value: element.Points });
+      countryData.barChartData.push({
+        name: "Points/match",
+        value: element.Pointsmatch,
+      });
+      countryData.barChartData.push({
+        name: "Scored",
+        value: element.Goal_For,
+      });
+      countryData.barChartData.push({
+        name: "Conceded",
+        value: element.Goal_Against,
+      });
+    }
+  });
+  return countryData;
+};
+
+// function to update the pie chart
+const updatePieChart = function (data, feature) {
+  const { pieChartData } = getCountryData(data, feature);
   // domain
-  pieChartColors.domain(pieData.map((d) => d.id));
+  pieChartColors.domain(pieChartData.map((pieChartDatum) => pieChartDatum.id));
   pieChartLegend.call(pieChartColorLegend);
 
   // setting paths
-  const paths = pieChartSvg.selectAll("path").data(pie(pieData));
+  const paths = pieChartSvg.selectAll("path").data(pie(pieChartData));
 
   // Select the legend items and add a stroke
-  const pieRects = d3.selectAll(".legendCells rect").data(pieData);
+  const pieRects = d3.selectAll(".legendCells rect").data(pieChartData);
   pieRects.attr("stroke", "black").attr("stroke-width", 0.5);
 
   // deleting elements
@@ -183,38 +231,6 @@ const updatePieChart = (data, i) => {
       tip.hide();
     });
 };
-
-function getCountryResults(data, i) {
-  const newPieData = [];
-
-  data.forEach((element) => {
-    if (element.Team == i.properties.name) {
-      newPieData.push({ id: "Win", value: element.Win });
-      newPieData.push({ id: "Draw", value: element.Draw });
-      newPieData.push({ id: "Loss", value: element.Loss });
-    }
-  });
-  return newPieData;
-}
-
-function getCountryData(data, i) {
-  const countryData = [];
-
-  data.forEach((element) => {
-    if (element.Team == i.properties.name) {
-      countryData.push({
-        name: "Participations",
-        value: element.Participations,
-      });
-      countryData.push({ name: "Played", value: element.Played });
-      countryData.push({ name: "Goal_For", value: element.Goal_For });
-      countryData.push({ name: "Goal_Against", value: element.Goal_Against });
-      countryData.push({ name: "Points", value: element.Points });
-      countryData.push({ name: "Points/match", value: element.Pointsmatch });
-    }
-  });
-  return countryData;
-}
 
 function handleRects(countryData) {
   // barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
@@ -307,24 +323,24 @@ function addBarGraphTip() {
 }
 
 function addBarGraphAxes() {
-  xAxisGroup.transition().duration(1500).call(xAxis);
+  barChartAxisX.transition().duration(1500).call(xAxis);
 
-  yAxisGroup.transition().duration(1500).call(yAxis);
+  barChartAxisY.transition().duration(1500).call(yAxis);
 
-  xAxisGroup.attr("font-size", 15);
-  yAxisGroup.attr("font-size", 15);
+  barChartAxisX.attr("font-size", 15);
+  barChartAxisY.attr("font-size", 15);
 }
 
-function updateBarChart(data, i) {
-  country.innerHTML = `${i.properties.name}`;
+function updateBarChart(data, feature) {
+  country.innerHTML = `${feature.properties.name}`;
 
-  const countryData = getCountryData(data, i);
+  const { barChartData } = getCountryData(data, feature);
 
-  yScale.domain([0, d3.max(countryData, (d) => d.value)]);
-  xScale.domain(countryData.map((d) => d.name));
+  yScale.domain([0, d3.max(barChartData, (d) => d.value)]);
+  xScale.domain(barChartData.map((d) => d.name));
 
-  colorScale.domain([0, d3.max(countryData, (d) => d.value)]);
-  handleRects(countryData);
+  colorScale.domain([0, d3.max(barChartData, (d) => d.value)]);
+  handleRects(barChartData);
   addBarGraphTip();
   addBarGraphAxes();
 }
@@ -348,20 +364,20 @@ const barGraphTitle = barChartSvg
   .append("text")
   .attr("transform", "translate(150,15)");
 
-function onClick(d, i) {
+function onClick(d, feature) {
   let flag = false;
 
   d3.json("euro_cup_teams.json").then(function (data) {
     data.forEach((element) => {
-      if (element.Country == i.properties.name) {
+      if (element.Country == feature.properties.name) {
         if (element.Country == "United Kingdom") {
           if (flag == false) {
-            chooseUKCountry(data, i);
+            chooseUKCountry(data, feature);
             flag = true;
           }
         } else {
-          updatePieChart(data, i);
-          updateBarChart(data, i);
+          updatePieChart(data, feature);
+          updateBarChart(data, feature);
         }
       }
     });
