@@ -1,3 +1,5 @@
+"use strict";
+
 // all countries/teams who participated in UEFA EURO
 let euroCupTeams = [];
 
@@ -102,6 +104,31 @@ const pie = d3
 // creating a new arc generator with the specified inner and outer radius
 const arcPath = d3.arc().outerRadius(outerRadius).innerRadius(innerRadius);
 
+/**
+ * Class representing an ArcTweenUpdater.
+ * This class is responsible for updating the arcs in the pie chart.
+ * @class
+ */
+class ArcTweenUpdater {
+  constructor() {
+    // default constructor
+  }
+
+  /**
+   * Updates the arc path based on the new data.
+   * @param {object} data - The new data for the arc.
+   * @returns {function} - The arc path function.
+   */
+  arcTweenUpdate(data) {
+    let interpolate = d3.interpolate(this.data, data);
+    this.data = data;
+
+    return (t) => arcPath(interpolate(t));
+  }
+}
+
+const arcTweenUpdate = new ArcTweenUpdater().arcTweenUpdate;
+
 // BAR CHART WITH A LEGEND
 const barChartSvg = d3
   .select("#graphs")
@@ -133,7 +160,7 @@ const barChartAxisX = barChartGroup
   .attr("transform", `translate(0, ${graphHeight})`);
 const barChartAxisY = barChartGroup.append("g");
 
-// function that returns data for the selected country
+// function that returns data for the clicked country map
 const getCountryData = function (data, feature) {
   // country data needed for both pie and bar chart
   const countryData = {
@@ -178,10 +205,11 @@ const getCountryData = function (data, feature) {
       });
     }
   });
+
   return countryData;
 };
 
-// function to update the pie chart
+// function that updates the pie chart
 const updatePieChart = function (data, feature) {
   const { pieChartData } = getCountryData(data, feature);
   // domain
@@ -191,20 +219,21 @@ const updatePieChart = function (data, feature) {
   // setting paths
   const paths = pieChartSvg.selectAll("path").data(pie(pieChartData));
 
-  // Select the legend items and add a stroke
+  // select the legend items and add a stroke
   const pieRects = d3.selectAll(".legendCells rect").data(pieChartData);
   pieRects.attr("stroke", "black").attr("stroke-width", 0.5);
 
   // deleting elements
   paths.exit().remove();
+
   // update current elements
   paths
     .attr("d", arcPath)
     .transition()
     .duration(750)
     .attrTween("d", arcTweenUpdate);
-  // create elements for data provided
 
+  // create elements for provided data
   paths
     .enter()
     .append("path")
@@ -213,21 +242,23 @@ const updatePieChart = function (data, feature) {
     .attr("stroke-width", 0.5)
     .attr("fill", (d) => pieChartColors(d.data.id))
     .each(function (d) {
-      this.trenutno = d;
+      this.data = d;
     })
     .transition()
     .duration(1000)
     .attrTween("d", arcTweenEnter);
 
+  // show tooltip on mouseover
+  // hide tooltip on mouseout
   pieChartSvg
     .selectAll("path")
-    .on("mouseover", (d, i, n) => {
-      tip.html((d) => {
-        return `${d.value}`;
+    .on("mouseover", (mouseoverData, arcData) => {
+      tip.html((mouseoverData) => {
+        return `${mouseoverData.value}`;
       });
-      tip.show(i, d.target);
+      tip.show(arcData, mouseoverData.target);
     })
-    .on("mouseout", (d) => {
+    .on("mouseout", () => {
       tip.hide();
     });
 };
@@ -481,28 +512,18 @@ function onMouseLeave() {
   tip.hide();
 }
 
-function arcTweenUpdate(d) {
-  let i = d3.interpolate(this.trenutno, d);
-
-  this.trenutno = d;
+const arcTweenEnter = function (data) {
+  const interpolate = d3.interpolate(data.endAngle, data.startAngle);
 
   return function (t) {
-    return arcPath(i(t));
-  };
-}
-
-const arcTweenEnter = (d) => {
-  let i = d3.interpolate(d.endAngle, d.startAngle);
-
-  return function (t) {
-    d.startAngle = i(t);
-    return arcPath(d);
+    data.startAngle = interpolate(t);
+    return arcPath(data);
   };
 };
 
-function barWidthTween(d) {
+const barWidthTween = function (d) {
   let i = d3.interpolate(0, xScale.bandwidth());
   return function (t) {
     return i(t);
   };
-}
+};
