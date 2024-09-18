@@ -162,4 +162,7 @@ path:hover,
 .barchart__legend-label-left, .barchart__legend-label-right {
   font-size: 20px;
   font-weight: 500;
+}
+.barchart__axis {
+  font-size: 15px;
 }/*# sourceMappingURL=style.css.map */

@@ -41,7 +41,14 @@ const svg = d3
   .attr("height", height)
   .attr("class", "map");
 
-// linear color shades from white to blue
+/**
+ * A linear color scale for mapping numerical values to color shades.
+ *
+ * @constant {d3.ScaleLinear<string>}
+ * @type {d3.ScaleLinear}
+ * @returns {string} A color corresponding to the input value, ranging from "white" for 0 to "blue" for 10.
+ *
+ */
 const mapColorShades = d3
   .scaleLinear()
   .domain([0, 10])
@@ -158,10 +165,20 @@ svg.call(tip);
 // AXISES
 const barChartAxisX = barChartSvg
   .append("g")
-  .attr("transform", `translate(0, ${graphHeight})`);
-const barChartAxisY = barChartSvg.append("g");
+  .attr("transform", `translate(0, ${graphHeight})`)
+  .attr("class", "barchart__axis");
+const barChartAxisY = barChartSvg.append("g").attr("class", "barchart__axis");
 
-// function that returns data for the clicked country map
+/**
+ * Retrieves country-specific data for visualization in pie and bar charts.
+ *
+ * @param {Array<Object>} data - The array of country data objects.
+ * @param {Object} feature - The feature object containing properties of the selected country.
+ * @param {string} feature.properties.name - The name of the country to filter data.
+ * @returns {Object} countryData - An object containing data for pie and bar charts.
+ * @returns {Array<Object>} countryData.pieChartData - Data for the pie chart, including wins, draws, and losses.
+ * @returns {Array<Object>} countryData.barChartData - Data for the bar chart, including participations, matches, points, points per match, goals scored, and goals conceded.
+ */
 const getCountryData = function (data, feature) {
   // country data needed for both pie and bar chart
   const countryData = {
@@ -210,7 +227,19 @@ const getCountryData = function (data, feature) {
   return countryData;
 };
 
-// function that updates the pie chart
+/**
+ * Updates the pie chart with new data and feature.
+ *
+ * @param {Object} data - The dataset containing country information.
+ * @param {string} feature - The feature to visualize in the pie chart.
+ *
+ * @returns {void} - This function does not return a value.
+ *
+ * @description This function retrieves the necessary data for the pie chart,
+ * updates the color domain, and manages the paths for the pie chart's arcs.
+ * It handles the entering, updating, and exiting of the pie chart elements,
+ * including transitions for a smooth visual update.
+ */
 const updatePieChart = function (data, feature) {
   const { pieChartData } = getCountryData(data, feature);
   // domain
@@ -249,22 +278,24 @@ const updatePieChart = function (data, feature) {
     .duration(1000)
     .attrTween("d", arcTweenEnter);
 
-  // show tooltip on mouseover
-  // hide tooltip on mouseout
-  pieChartSvg
-    .selectAll("path")
-    .on("mouseover", (mouseoverData, arcData) => {
-      tip.html((mouseoverData) => {
-        return `${mouseoverData.value}`;
-      });
-      tip.show(arcData, mouseoverData.target);
-    })
-    .on("mouseout", () => {
-      tip.hide();
-    });
+  toggleTip(pieChartSvg, "path");
 };
 
-// function that updates the bar chart
+/**
+ * Handles the rendering and updating of rectangles in a bar chart.
+ *
+ * This function takes in the bar chart data, binds it to the rectangles,
+ * and manages the enter, update, and exit selections for the rectangles.
+ * It also creates a legend for the bar chart with color-coded rectangles
+ * and corresponding labels.
+ *
+ * @param {Array<Object>} barChartData - The data to be visualized in the bar chart.
+ * Each object in the array should contain:
+ *   - {string} name - The name associated with the bar.
+ *   - {number} value - The value associated with the bar.
+ *
+ * @returns {void}
+ */
 const handleRects = function (barChartData) {
   // select all bar chart rectangles
   const rects = barChartSvg.selectAll("rect").data(barChartData);
@@ -341,28 +372,39 @@ const handleRects = function (barChartData) {
   }
 };
 
-function addBarGraphTip() {
-  barChartSvg
-    .selectAll("rect")
-    .on("mouseover", (d, i, n) => {
-      tip.html((d) => {
-        return `${d.value}`;
+/**
+ * Toggles the display of a tooltip on mouse events for a specified group in a chart.
+ *
+ * @param {Selection} chartSvg - The SVG selection of the chart where the tooltip will be displayed.
+ * @param {string} group - The selector for the group of elements to attach the tooltip events to.
+ *
+ * @returns {void}
+ */
+const toggleTip = function (chartSvg, group) {
+  chartSvg
+    .selectAll(group)
+    .on("mouseover", (mouseoverData, arcData) => {
+      tip.html((mouseoverData) => {
+        return `${mouseoverData.value}`;
       });
-      tip.show(i, d.target);
+      tip.show(arcData, mouseoverData.target);
     })
-    .on("mouseout", (d) => {
+    .on("mouseout", () => {
       tip.hide();
     });
-}
+};
 
-function addBarGraphAxes() {
+/**
+ * Adds axes to the bar chart with a transition effect.
+ * The X and Y axes are updated with a duration of 1500 milliseconds.
+ *
+ * @function addBarChartAxises
+ * @returns {void}
+ */
+const addBarChartAxises = function () {
   barChartAxisX.transition().duration(1500).call(xAxis);
-
   barChartAxisY.transition().duration(1500).call(yAxis);
-
-  barChartAxisX.attr("font-size", 15);
-  barChartAxisY.attr("font-size", 15);
-}
+};
 
 function updateBarChart(data, feature) {
   country.innerHTML = `${feature.properties.name}`;
@@ -374,8 +416,8 @@ function updateBarChart(data, feature) {
 
   colorScale.domain([0, d3.max(barChartData, (d) => d.value)]);
   handleRects(barChartData);
-  addBarGraphTip();
-  addBarGraphAxes();
+  toggleTip(barChartSvg, "rect");
+  addBarChartAxises();
 }
 
 const colorScale = d3.scaleLinear().range([0, 10]);
