@@ -130,20 +130,21 @@ class ArcTweenUpdater {
 const arcTweenUpdate = new ArcTweenUpdater().arcTweenUpdate;
 
 // BAR CHART WITH A LEGEND
-const barChartSvg = d3
+const barChartGroup = d3
   .select("#graphs")
   .append("svg")
   .attr("class", "barchart");
 
-const barChartLegend = barChartSvg
+const barChartLegend = barChartGroup
   .append("g")
   .attr("class", "barchart__legend");
 
-const barChartGroup = barChartSvg
+const barChartSvg = barChartGroup
   .append("g")
   .attr("width", graphWidth)
   .attr("height", graphHeight)
-  .attr("transform", `translate(${margin.right + 35}, ${margin.top + 20})`);
+  .attr("transform", `translate(${margin.right + 35}, ${margin.top + 20})`)
+  .attr("class", "barchart__svg");
 
 // D3TIP
 // tooltip initialization
@@ -151,14 +152,14 @@ const tip = d3.tip().attr("class", "d3tip");
 
 // invoking the tooltip in the context of visualizations
 pieChartSvg.call(tip);
-barChartSvg.call(tip);
+barChartGroup.call(tip);
 svg.call(tip);
 
 // AXISES
-const barChartAxisX = barChartGroup
+const barChartAxisX = barChartSvg
   .append("g")
   .attr("transform", `translate(0, ${graphHeight})`);
-const barChartAxisY = barChartGroup.append("g");
+const barChartAxisY = barChartSvg.append("g");
 
 // function that returns data for the clicked country map
 const getCountryData = function (data, feature) {
@@ -223,17 +224,17 @@ const updatePieChart = function (data, feature) {
   const pieRects = d3.selectAll(".legendCells rect").data(pieChartData);
   pieRects.attr("stroke", "black").attr("stroke-width", 0.5);
 
-  // deleting elements
+  // deleting paths
   paths.exit().remove();
 
-  // update current elements
+  // update current paths
   paths
     .attr("d", arcPath)
     .transition()
     .duration(750)
     .attrTween("d", arcTweenUpdate);
 
-  // create elements for provided data
+  // create paths for provided data
   paths
     .enter()
     .append("path")
@@ -263,84 +264,85 @@ const updatePieChart = function (data, feature) {
     });
 };
 
-function handleRects(countryData) {
-  // barGraphTitle.text(`Country data on EURO`).style("font-size", 17);
+// function that updates the bar chart
+const handleRects = function (barChartData) {
+  // select all bar chart rectangles
+  const rects = barChartSvg.selectAll("rect").data(barChartData);
+  // spacing between bar chart legend rectangles
+  let spacingBetweenBarChartLegendRects = 10;
 
-  let colors = [
-    "#fcebeb",
-    "#fadede",
-    "#fccfcf",
-    "#fc9f9f",
-    "#fa8787",
-    "#fa5c5c",
-    "#ff0000",
-    "#9e0303",
-  ];
-  // Rectangles
-  const rects = barChartGroup.selectAll("rect").data(countryData);
-
+  // deleting rectangles
   rects.exit().remove();
 
+  // names on X axis
+  // values on Y axis
   rects
-    .attr("width", xScale.bandwidth)
+    .attr("width", barChartScaleX.bandwidth)
     .attr("fill", (d) => {
-      let value = Math.round(colorScale(d.value));
-      return colors[value];
+      return mapColorShades(colorScale(d.value));
     })
-    .attr("x", (d) => xScale(d.name))
+    .attr("x", (d) => barChartScaleX(d.name))
     .transition()
     .duration(750)
-    .attr("y", (d) => yScale(d.value))
-    .attr("height", (d) => graphHeight - yScale(d.value));
+    .attr("y", (d) => barChartScaleY(d.value))
+    .attr("height", (d) => graphHeight - barChartScaleY(d.value));
 
+  // create rects for provided data
   rects
     .enter()
     .append("rect")
     .attr("height", 0)
     .attr("fill", (d) => {
-      let value = Math.round(colorScale(d.value));
-      return colors[value];
+      console.log(d.value);
+      return mapColorShades(colorScale(d.value));
     })
     .attr("stroke", "black")
-    .attr("x", (d) => xScale(d.name))
+    .attr("x", (d) => barChartScaleX(d.name))
     .attr("y", graphHeight)
     .transition()
     .duration(750)
     .attrTween("width", barWidthTween)
-    .attr("y", (d) => yScale(d.value))
-    .attr("height", (d) => graphHeight - yScale(d.value));
+    .attr("y", (d) => barChartScaleY(d.value))
+    .attr("height", (d) => graphHeight - barChartScaleY(d.value));
 
-  // bar chart legend in form of rectangles
-  let x = 10;
-  for (let i = 0; i < 8; i++) {
+  // bar chart legend in the form of rectangles
+  for (let i = 0; i < 10; i++) {
     barChartLegend
       .append("rect")
-      .attr("x", x)
+      .attr("x", spacingBetweenBarChartLegendRects)
       .attr("y", 120)
       .attr("width", 25)
       .attr("height", 25)
       .attr("stroke", "black")
-      .attr("fill", colors[i]);
-    x += 30;
+      .attr("fill", mapColorShades(i));
+    spacingBetweenBarChartLegendRects += 30;
+
+    // creating left bar chart legend label
+    barChartLegend
+      .append("text")
+      .attr("x", -10)
+      .attr("y", 140)
+      .attr("class", "barchart__legend-label-left");
+
+    // creating right bar chart legend label
+    barChartLegend
+      .append("text")
+      .attr("x", 315)
+      .attr("y", 140)
+      .attr("class", "barchart__legend-label-right");
+
+    // fetching bar chart legend labels
+    const barChartLegendLeftLabel = d3.select(".barchart__legend-label-left");
+    const barChartLegendRightLabel = d3.select(".barchart__legend-label-right");
+
+    // bar chart legend label range values
+    barChartLegendLeftLabel.text("0");
+    barChartLegendRightLabel.text(d3.max(barChartData, (d) => d.value));
   }
-
-  barChartLegend
-    .append("text")
-    .attr("x", -75)
-    .attr("y", 140)
-    .text(`Manji broj`)
-    .style("font-size", 18);
-
-  barChartLegend
-    .append("text")
-    .attr("x", 250)
-    .attr("y", 140)
-    .text(`Veći broj`)
-    .style("font-size", 18);
-}
+};
 
 function addBarGraphTip() {
-  barChartGroup
+  barChartSvg
     .selectAll("rect")
     .on("mouseover", (d, i, n) => {
       tip.html((d) => {
@@ -367,8 +369,8 @@ function updateBarChart(data, feature) {
 
   const { barChartData } = getCountryData(data, feature);
 
-  yScale.domain([0, d3.max(barChartData, (d) => d.value)]);
-  xScale.domain(barChartData.map((d) => d.name));
+  barChartScaleY.domain([0, d3.max(barChartData, (d) => d.value)]);
+  barChartScaleX.domain(barChartData.map((d) => d.name));
 
   colorScale.domain([0, d3.max(barChartData, (d) => d.value)]);
   handleRects(barChartData);
@@ -376,24 +378,20 @@ function updateBarChart(data, feature) {
   addBarGraphAxes();
 }
 
-const colorScale = d3.scaleLinear().range([0, 6]);
+const colorScale = d3.scaleLinear().range([0, 10]);
 // scales and axes for bar chart
-const yScale = d3.scaleLinear().range([graphHeight, 0]);
+const barChartScaleY = d3.scaleLinear().range([graphHeight, 0]);
 
-const xScale = d3
+const barChartScaleX = d3
   .scaleBand()
   .range([0, 500])
   .paddingInner(0.3)
   .paddingOuter(0.3);
 
-const xAxis = d3.axisBottom(xScale);
-const yAxis = d3.axisLeft(yScale).ticks(10);
+const xAxis = d3.axisBottom(barChartScaleX);
+const yAxis = d3.axisLeft(barChartScaleY).ticks(10);
 
 const country = document.querySelector(".country");
-
-const barGraphTitle = barChartSvg
-  .append("text")
-  .attr("transform", "translate(150,15)");
 
 function onClick(d, feature) {
   let flag = false;
@@ -508,9 +506,9 @@ function onMouseOver(i, d) {
   });
 }
 
-function onMouseLeave() {
+const onMouseLeave = function () {
   tip.hide();
-}
+};
 
 const arcTweenEnter = function (data) {
   const interpolate = d3.interpolate(data.endAngle, data.startAngle);
@@ -522,8 +520,6 @@ const arcTweenEnter = function (data) {
 };
 
 const barWidthTween = function (d) {
-  let i = d3.interpolate(0, xScale.bandwidth());
-  return function (t) {
-    return i(t);
-  };
+  const interpolate = d3.interpolate(0, barChartScaleX.bandwidth());
+  return (t) => interpolate(t);
 };

@@ -8,7 +8,8 @@ html {
 }
 
 /* path on the map */
-path:hover {
+path:hover,
+.barchart__svg rect:hover {
   fill: rgba(8, 81, 156, 0.5);
   cursor: pointer;
 }
@@ -68,7 +69,7 @@ path:hover {
   margin: 0 40px;
 }
 
-/* selection box for UK country */
+/* selection box for UK countries */
 .selection-box {
   width: 360px;
   border-radius: 1px;
@@ -156,5 +157,9 @@ path:hover {
 .barchart__legend {
   width: 400px;
   height: 25px;
-  transform: translate(180px, 330px);
+  transform: translate(160px, 330px);
+}
+.barchart__legend-label-left, .barchart__legend-label-right {
+  font-size: 20px;
+  font-weight: 500;
 }/*# sourceMappingURL=style.css.map */
